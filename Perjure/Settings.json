@@ -1,0 +1,9 @@
+﻿[
+  {
+    "DirectoryPath": "D:\\PerjureTest",
+    "MatchPattern": "",
+    "DaysToPurgeAfter": 30,
+    "IncludeSubfolders": false,
+    "IncludeHiddenFiles": false
+  }
+]
