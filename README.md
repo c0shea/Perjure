@@ -38,6 +38,17 @@ Using the default settings file:
 
 > Note: The program does not prompt before deleting files. You should be sure that the directories specified in the settings file are what you *actually* want the program to purge before running the program.
 
+## Exit Codes
+The program will return different exit codes so that appropriate error handling can be added to the calling application. This allows enterprise job schedulers, for example, to fail the job if Perjure returns an exit code other than ```0```.
+
+* **0 - Success:** The program completed normally
+* **1 - Invalid Configuration:** The configuration file is not formatted correctly or the file could not be found
+* **2 - Directory Not Found:** A directory in the configuration file was not found and could not be purged
+* **4 - File Not Deleted:** A file was not deleted, which can be caused by any number of reasons. The file may be marked as read-only, the user account running Perjure does not have access to delete the file, or the file existed when the list of files to delete was constructed but was deleted by another user or process before Perjure could delete the file.
+
+Since the exit codes are a C# Flags Enum, additional exit codes can be returned which are a combination of those above. For example, ```6``` could be returned, which means that both a directory was not found and a file was not deleted.
+
+
 ## Contributing
 
 1. Fork it!
