@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Perjure")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Purge folders after the number of days you define")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Perjure")]
-[assembly: AssemblyCopyright("Copyright © 2016")]
+[assembly: AssemblyCopyright("Copyright © 2016 Connor O'Shea")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
