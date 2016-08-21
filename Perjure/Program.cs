@@ -1,27 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Perjure {
     public class Program {
-        public static void Main(string[] args) {
+        public static int Main(string[] args) {
             var startTime = DateTime.UtcNow;
-            Console.WriteLine($"Program started at {startTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
+            Console.WriteLine($"Program started at:       {startTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
 
             var settingsFilePath = GetSettingsFilePath(args);
-            Console.WriteLine($"Settings file: {settingsFilePath}");
+            Console.WriteLine($"Settings file:            {settingsFilePath}");
 
             var rules = ReadRulesFromSettingsFile(settingsFilePath);
 
+            if (rules == null) {
+                return (int)ExitCode.InvalidConfiguration;
+            }
+
             Console.WriteLine("Processing rules...\n");
-            ProcessRules(rules);
+            var purgeResults = ProcessRules(rules).ToList();
 
+            Console.WriteLine($"\nTotal directories purged: {purgeResults.Count(d => d.WasDirectoryPurged)}");
+            Console.WriteLine($"Total files deleted:      {purgeResults.Sum(d => d.FilesDeletedCount)}");
+            
             var endTime = DateTime.UtcNow;
-            Console.WriteLine($"\nProgram ended at {endTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
-            Console.WriteLine($"Total seconds elapsed: {(endTime - startTime).TotalSeconds.ToString("N")}");
+            Console.WriteLine($"Program ended at:         {endTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
+            Console.WriteLine($"Total seconds elapsed:    {(endTime - startTime).TotalSeconds.ToString("N")}");
 
-            Console.ReadLine();
+            var programExitCode = ExitCode.Success;
+            foreach (var exitCode in purgeResults.Select(d => d.RuleExitCode).Distinct())
+            {
+                programExitCode |= exitCode;
+            }
+
+            return (int)programExitCode;
         }
 
         private static string GetSettingsFilePath(string[] args) {
@@ -31,13 +45,27 @@ namespace Perjure {
         }
 
         private static List<PurgeRule> ReadRulesFromSettingsFile(string settingsFilePath) {
-            return JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
+            try {
+                var rules = JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
+                return rules;
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"ERROR: Invalid configuration. {ex.Message}");
+            }
+
+            return null;
         }
 
-        private static void ProcessRules(List<PurgeRule> rules) {
-            foreach (var rule in rules) {
-                rule.Process();
-            }
+        private static IEnumerable<Statistic> ProcessRules(IEnumerable<PurgeRule> rules) {
+            return rules.Select(rule => rule.Process());
         }
+    }
+
+    [Flags]
+    public enum ExitCode {
+        Success = 0,
+        InvalidConfiguration = 1,
+        DirectoryNotFound = 2,
+        FileNotDeleted = 4
     }
 }
