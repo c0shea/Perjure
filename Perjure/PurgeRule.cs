@@ -26,7 +26,13 @@ namespace Perjure
         /// </summary>
         public short DaysToPurgeAfter { get; set; }
 
-        
+        /// <summary>
+        /// Specifies a minimum number of most recent files that should be kept even if they match all
+        /// of the criteria (ignoring the <see cref="DaysToPurgeAfter"/>). For example, setting this to 5
+        /// allows you to keep the most recent 5 files in this directory matching the <see cref="MatchPattern"/>
+        /// but all others that are older than the <see cref="DaysToPurgeAfter"/> will be purged.
+        /// </summary>
+        public int? MinimumFilesToKeep { get; set; }
 
         /// <summary>
         /// Specifies whether or not sub-folders are included
@@ -68,7 +74,7 @@ namespace Perjure
 
             Log.Info("Purging '{0}'", DirectoryPath);
 
-            var filesToPurge = BuildFilesToPurge(compareToDate);
+            var filesToPurge = FilesToPurge(compareToDate);
 
             if (filesToPurge.Count == 0)
             {
@@ -94,7 +100,36 @@ namespace Perjure
             return result;
         }
 
-        private List<FileInfo> BuildFilesToPurge(DateTime compareToDate)
+        private List<FileInfo> FilesToPurge(DateTime compareToDate)
+        {
+            var allFilesMatchingName = AllFilesMatchingName();
+            IEnumerable<FileInfo> filesToPurge = allFilesMatchingName;
+            IEnumerable<FileInfo> filesToKeep = allFilesMatchingName;
+
+            switch (TimeComparison)
+            {
+                case TimeComparison.Creation:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.CreationTimeUtc).TotalDays > DaysToPurgeAfter);
+                    filesToKeep = filesToPurge.OrderByDescending(f => f.CreationTimeUtc);
+                    break;
+
+                case TimeComparison.Write:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastWriteTimeUtc).TotalDays > DaysToPurgeAfter);
+                    filesToKeep = filesToPurge.OrderByDescending(f => f.LastWriteTimeUtc);
+                    break;
+
+                case TimeComparison.Access:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastAccessTimeUtc).TotalDays > DaysToPurgeAfter);
+                    filesToKeep = filesToPurge.OrderByDescending(f => f.LastAccessTimeUtc);
+                    break;
+            }
+
+            filesToKeep = filesToKeep.Take(MinimumFilesToKeep ?? 0);
+
+            return filesToPurge.Except(filesToKeep).ToList();
+        }
+
+        private List<FileInfo> AllFilesMatchingName()
         {
             var directory = new DirectoryInfo(DirectoryPath);
             var regexPattern = new Regex(MatchPattern);
@@ -106,21 +141,6 @@ namespace Perjure
             if (!IncludeHiddenFiles)
             {
                 filesToPurge = filesToPurge.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
-            }
-
-            switch (TimeComparison)
-            {
-                case TimeComparison.Creation:
-                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.CreationTimeUtc).TotalDays > DaysToPurgeAfter);
-                    break;
-
-                case TimeComparison.Write:
-                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastWriteTimeUtc).TotalDays > DaysToPurgeAfter);
-                    break;
-
-                case TimeComparison.Access:
-                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastAccessTimeUtc).TotalDays > DaysToPurgeAfter);
-                    break;
             }
 
             return filesToPurge.ToList();
