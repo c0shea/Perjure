@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,17 +11,43 @@ namespace Perjure
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Specifies the directory to purge, e.g. D:\Temp
+        /// </summary>
         public string DirectoryPath { get; set; }
+
+        /// <summary>
+        /// Specifies the regular expression to match files, e.g. ^.*\.txt?$ matches files with .txt extension
+        /// </summary>
         public string MatchPattern { get; set; }
+
+        /// <summary>
+        /// Specifies the number of days that a file must at least be in age in order to be purged
+        /// </summary>
         public short DaysToPurgeAfter { get; set; }
+
+        
+
+        /// <summary>
+        /// Specifies whether or not sub-folders are included
+        /// </summary>
         public bool IncludeSubfolders { get; set; }
+
+        /// <summary>
+        /// Specifies whether or not hidden files are included
+        /// </summary>
         public bool IncludeHiddenFiles { get; set; }
+
+        /// <summary>
+        /// Specifies the type of file date to compare to the current system time when evaluating the <see cref="DaysToPurgeAfter"/>
+        /// </summary>
+        public TimeComparison TimeComparison { get; set; }
 
         /// <summary>
         /// Purges the matching files in DirectoryPath
         /// </summary>
         /// <returns>The number of files deleted from DirectoryPath</returns>
-        public PurgeResult Process()
+        public PurgeResult Process(DateTime compareToDate)
         {
             var result = new PurgeResult
             {
@@ -41,25 +68,14 @@ namespace Perjure
 
             Log.Info("Purging '{0}'", DirectoryPath);
 
-            var directory = new DirectoryInfo(DirectoryPath);
-            var regexPattern = new Regex(MatchPattern);
-            var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
-            var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
-                                                   regexPattern.IsMatch(f.Name) &&
-                                                   (DateTime.UtcNow - f.CreationTimeUtc).Days > DaysToPurgeAfter).ToList();
-
-            if (!IncludeHiddenFiles)
-            {
-                filesToPurge = filesToPurge.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden)).ToList();
-            }
+            var filesToPurge = BuildFilesToPurge(compareToDate);
 
             if (filesToPurge.Count == 0)
             {
                 Log.Debug("No files to purge in directory");
             }
 
-            foreach (var file in filesToPurge.ToList())
+            foreach (var file in filesToPurge)
             {
                 try
                 {
@@ -76,6 +92,38 @@ namespace Perjure
             }
 
             return result;
+        }
+
+        private List<FileInfo> BuildFilesToPurge(DateTime compareToDate)
+        {
+            var directory = new DirectoryInfo(DirectoryPath);
+            var regexPattern = new Regex(MatchPattern);
+            var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+            var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
+                                                   regexPattern.IsMatch(f.Name));
+
+            if (!IncludeHiddenFiles)
+            {
+                filesToPurge = filesToPurge.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
+            }
+
+            switch (TimeComparison)
+            {
+                case TimeComparison.Creation:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.CreationTimeUtc).TotalDays > DaysToPurgeAfter);
+                    break;
+
+                case TimeComparison.Write:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastWriteTimeUtc).TotalDays > DaysToPurgeAfter);
+                    break;
+
+                case TimeComparison.Access:
+                    filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastAccessTimeUtc).TotalDays > DaysToPurgeAfter);
+                    break;
+            }
+
+            return filesToPurge.ToList();
         }
     }
 }

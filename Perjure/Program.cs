@@ -78,7 +78,10 @@ namespace Perjure
 
         private static List<PurgeResult> ProcessRules(IEnumerable<PurgeRule> rules)
         {
-            return rules.Select(rule => rule.Process()).ToList();
+            // In order to ensure consistency, all files are compared to the same DateTime
+            var compareToDate = DateTime.UtcNow;
+
+            return rules.Select(rule => rule.Process(compareToDate)).ToList();
         }
     }
 }
