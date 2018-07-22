@@ -7,9 +7,13 @@ using NLog;
 
 namespace Perjure
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class PurgeRule
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable UnusedAutoPropertyAccessor.Global
 
         /// <summary>
         /// Specifies the directory to purge, e.g. D:\Temp
@@ -48,6 +52,9 @@ namespace Perjure
         /// Specifies the type of file date to compare to the current system time when evaluating the <see cref="DaysToPurgeAfter"/>
         /// </summary>
         public TimeComparison TimeComparison { get; set; }
+
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore UnusedAutoPropertyAccessor.Global
 
         /// <summary>
         /// Purges the matching files in DirectoryPath
@@ -132,7 +139,7 @@ namespace Perjure
         private List<FileInfo> AllFilesMatchingName()
         {
             var directory = new DirectoryInfo(DirectoryPath);
-            var regexPattern = new Regex(MatchPattern);
+            var regexPattern = new Regex(MatchPattern ?? "");
             var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
