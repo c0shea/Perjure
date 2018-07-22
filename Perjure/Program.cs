@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Perjure {
-    public class Program {
-        public static int Main(string[] args) {
+namespace Perjure
+{
+    public class Program
+    {
+        public static int Main(string[] args)
+        {
             var startTime = DateTime.UtcNow;
             Console.WriteLine($"Program started at:       {startTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
 
@@ -15,7 +18,8 @@ namespace Perjure {
 
             var rules = ReadRulesFromSettingsFile(settingsFilePath);
 
-            if (rules == null) {
+            if (rules == null)
+            {
                 return (int)ExitCode.InvalidConfiguration;
             }
 
@@ -24,7 +28,7 @@ namespace Perjure {
 
             Console.WriteLine($"\nTotal directories purged: {purgeResults.Count(d => d.WasDirectoryPurged)}");
             Console.WriteLine($"Total files deleted:      {purgeResults.Sum(d => d.FilesDeletedCount)}");
-            
+
             var endTime = DateTime.UtcNow;
             Console.WriteLine($"Program ended at:         {endTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
             Console.WriteLine($"Total seconds elapsed:    {(endTime - startTime).TotalSeconds.ToString("N")}");
@@ -38,31 +42,37 @@ namespace Perjure {
             return (int)programExitCode;
         }
 
-        private static string GetSettingsFilePath(string[] args) {
+        private static string GetSettingsFilePath(string[] args)
+        {
             return args.Length == 1
                     ? args[0]
                     : Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
         }
 
-        private static List<PurgeRule> ReadRulesFromSettingsFile(string settingsFilePath) {
-            try {
+        private static List<PurgeRule> ReadRulesFromSettingsFile(string settingsFilePath)
+        {
+            try
+            {
                 var rules = JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
                 return rules;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine($"ERROR: Invalid configuration. {ex.Message}");
             }
 
             return null;
         }
 
-        private static IEnumerable<Statistic> ProcessRules(IEnumerable<PurgeRule> rules) {
+        private static IEnumerable<Statistic> ProcessRules(IEnumerable<PurgeRule> rules)
+        {
             return rules.Select(rule => rule.Process());
         }
     }
 
     [Flags]
-    public enum ExitCode {
+    public enum ExitCode
+    {
         Success = 0,
         InvalidConfiguration = 1,
         DirectoryNotFound = 2,
