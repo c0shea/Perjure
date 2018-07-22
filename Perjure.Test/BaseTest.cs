@@ -17,12 +17,21 @@ namespace Perjure.Test
             Directory.CreateDirectory(TempPath);
 
             CreateFile("Today.txt");
-            CreateFile("Yesterday.txt", Now(-1));
-            CreateFile("Tomorrow.txt", Now(1));
-            CreateFile("Future7Days.txt", Now(7));
-            CreateFile("Past7Days.txt", Now(-7));
+            CreateFile("Today.csv");
 
-            StartingFileCount = 5;
+            CreateFile("Tomorrow.txt", Now(1));
+            CreateFile("Tomorrow.csv", Now(1));
+            CreateFile("Future7Days.txt", Now(7));
+            CreateFile("Future7Days.csv", Now(7));
+
+            CreateFile("Yesterday.txt", Now(-1));
+            CreateFile("Yesterday.csv", Now(-1));
+            CreateFile("Past7Days.txt", Now(-7));
+            CreateFile("Past7Days.csv", Now(-7));
+            CreateFile("Hidden.txt", Now(-7), true);
+            CreateFile("Hidden.csv", Now(-7), true);
+
+            StartingFileCount = FileCount;
         }
 
         [TestCleanup]
@@ -32,7 +41,7 @@ namespace Perjure.Test
 
         private DateTime Now(int daysFromNow) => DateTime.UtcNow.AddDays(daysFromNow);
 
-        private void CreateFile(string fileName, DateTime? allAttributeTime = null)
+        private void CreateFile(string fileName, DateTime? allAttributeTime = null, bool isHidden = false)
         {
             var path = Path.Combine(TempPath, fileName);
 
@@ -45,8 +54,17 @@ namespace Perjure.Test
             {
                 CreationTimeUtc = allAttributeTime ?? now,
                 LastWriteTimeUtc = allAttributeTime ?? now,
-                LastAccessTimeUtc = allAttributeTime ?? now
+                LastAccessTimeUtc = allAttributeTime ?? now,
             };
+
+            if (isHidden)
+            {
+                fileInfo.Attributes |= FileAttributes.Hidden;
+            }
+            else
+            {
+                fileInfo.Attributes &= ~FileAttributes.Hidden;
+            }
         }
     }
 }
