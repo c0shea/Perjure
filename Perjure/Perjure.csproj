@@ -59,10 +59,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExitCode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PurgeRule.cs" />
-    <Compile Include="Statistic.cs" />
+    <Compile Include="PurgeResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Trash Can.ico" />
@@ -74,7 +75,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <Content Include="Settings.json">
+    <Content Include="Configuration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

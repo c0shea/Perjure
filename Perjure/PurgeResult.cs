@@ -1,6 +1,6 @@
 ﻿namespace Perjure
 {
-    internal class Statistic
+    public class PurgeResult
     {
         public bool WasDirectoryPurged { get; set; }
         public long FilesDeletedCount { get; set; }

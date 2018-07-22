@@ -2,11 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace Perjure
 {
     public class PurgeRule
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         public string DirectoryPath { get; set; }
         public string MatchPattern { get; set; }
         public short DaysToPurgeAfter { get; set; }
@@ -17,9 +20,9 @@ namespace Perjure
         /// Purges the matching files in DirectoryPath
         /// </summary>
         /// <returns>The number of files deleted from DirectoryPath</returns>
-        internal Statistic Process()
+        public PurgeResult Process()
         {
-            var statistic = new Statistic
+            var result = new PurgeResult
             {
                 WasDirectoryPurged = true,
                 RuleExitCode = ExitCode.Success
@@ -27,26 +30,20 @@ namespace Perjure
 
             if (!Directory.Exists(DirectoryPath))
             {
-                statistic.FilesDeletedCount = 0;
-                statistic.WasDirectoryPurged = false;
-                statistic.RuleExitCode = ExitCode.DirectoryNotFound;
-                Console.WriteLine($"\nERROR: The directory \"{DirectoryPath}\" was not found.");
-                return statistic;
+                result.FilesDeletedCount = 0;
+                result.WasDirectoryPurged = false;
+                result.RuleExitCode = ExitCode.DirectoryNotFound;
+                
+                Log.Error("Directory '{0}' was not found", DirectoryPath);
+
+                return result;
             }
 
-            Console.WriteLine(DirectoryPath);
-            int maxWidth = DirectoryPath.Length > 80 ? 80 : DirectoryPath.Length;
-            for (int i = 0; i < maxWidth; i++)
-            {
-                Console.Write("=");
-            }
-            Console.WriteLine();
+            Log.Info("Purging '{0}'", DirectoryPath);
 
             var directory = new DirectoryInfo(DirectoryPath);
-
-            var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
             var regexPattern = new Regex(MatchPattern);
+            var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
                                                    regexPattern.IsMatch(f.Name) &&
@@ -59,7 +56,7 @@ namespace Perjure
 
             if (filesToPurge.Count == 0)
             {
-                Console.WriteLine("No files to purge in directory.");
+                Log.Debug("No files to purge in directory");
             }
 
             foreach (var file in filesToPurge.ToList())
@@ -67,17 +64,18 @@ namespace Perjure
                 try
                 {
                     file.Delete();
-                    Console.WriteLine($"Deleted {file.FullName}");
-                    statistic.FilesDeletedCount++;
+
+                    Log.Debug("Deleted '{0}'", file.FullName);
+                    result.FilesDeletedCount++;
                 }
                 catch (Exception ex)
                 {
-                    statistic.RuleExitCode = ExitCode.FileNotDeleted;
-                    Console.WriteLine($"ERROR: Couldn't delete file \"{file.FullName}\". {ex.Message}");
+                    result.RuleExitCode = ExitCode.FileNotDeleted;
+                    Log.Error(ex, "Failed to delete file '{0}'", file.FullName);
                 }
             }
 
-            return statistic;
+            return result;
         }
     }
 }

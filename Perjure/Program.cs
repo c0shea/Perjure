@@ -1,81 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Perjure
 {
-    public class Program
+    public static class Program
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private const string ConfigurationFileName = "Configuration.json";
+
         public static int Main(string[] args)
         {
-            var startTime = DateTime.UtcNow;
-            Console.WriteLine($"Program started at:       {startTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
+            Log.Info("Started");
 
-            var settingsFilePath = GetSettingsFilePath(args);
-            Console.WriteLine($"Settings file:            {settingsFilePath}");
+            var settingsFilePath = GetConfigurationFilePath(args);
+            Log.Debug("Using settings file '{0}'", settingsFilePath);
 
             var rules = ReadRulesFromSettingsFile(settingsFilePath);
-
             if (rules == null)
             {
                 return (int)ExitCode.InvalidConfiguration;
             }
 
-            Console.WriteLine("Processing rules...\n");
-            var purgeResults = ProcessRules(rules).ToList();
+            Log.Info("Processing rules...");
+            var stopwatch = Stopwatch.StartNew();
 
-            Console.WriteLine($"\nTotal directories purged: {purgeResults.Count(d => d.WasDirectoryPurged)}");
-            Console.WriteLine($"Total files deleted:      {purgeResults.Sum(d => d.FilesDeletedCount)}");
+            var purgeResults = ProcessRules(rules);
 
-            var endTime = DateTime.UtcNow;
-            Console.WriteLine($"Program ended at:         {endTime.ToString("MM/dd/yyyy hh:mm:ss tt")} UTC");
-            Console.WriteLine($"Total seconds elapsed:    {(endTime - startTime).TotalSeconds.ToString("N")}");
+            stopwatch.Stop();
 
+            Log.Info("{0} total seconds elapsed", stopwatch.Elapsed.TotalSeconds);
+            Log.Info("{0} directories purged", purgeResults.Count(r => r.WasDirectoryPurged));
+            Log.Info("{0} files deleted", purgeResults.Sum(r => r.FilesDeletedCount));
+            
             var programExitCode = ExitCode.Success;
             foreach (var exitCode in purgeResults.Select(d => d.RuleExitCode).Distinct())
             {
                 programExitCode |= exitCode;
             }
 
+            if (programExitCode == ExitCode.Success)
+            {
+                Log.Info("Finished successfully.");
+            }
+            else
+            {
+                Log.Error("One or more purge rules were not processed successfully. Finished with errors.");
+            }
+
             return (int)programExitCode;
         }
 
-        private static string GetSettingsFilePath(string[] args)
+        private static string GetConfigurationFilePath(string[] args)
         {
             return args.Length == 1
                     ? args[0]
-                    : Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
+                    : Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), ConfigurationFileName);
         }
 
         private static List<PurgeRule> ReadRulesFromSettingsFile(string settingsFilePath)
         {
             try
             {
-                var rules = JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
-                return rules;
+                return JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ERROR: Invalid configuration. {ex.Message}");
+                Log.Fatal(ex, "Failed to read configuration file or configuration is invalid.");
             }
 
             return null;
         }
 
-        private static IEnumerable<Statistic> ProcessRules(IEnumerable<PurgeRule> rules)
+        private static List<PurgeResult> ProcessRules(IEnumerable<PurgeRule> rules)
         {
-            return rules.Select(rule => rule.Process());
+            return rules.Select(rule => rule.Process()).ToList();
         }
-    }
-
-    [Flags]
-    public enum ExitCode
-    {
-        Success = 0,
-        InvalidConfiguration = 1,
-        DirectoryNotFound = 2,
-        FileNotDeleted = 4
     }
 }
