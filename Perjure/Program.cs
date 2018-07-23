@@ -45,7 +45,7 @@ namespace Perjure
 
             if (programExitCode == ExitCode.Success)
             {
-                Log.Info("Finished successfully.");
+                Log.Info("Finished successfully");
             }
             else
             {

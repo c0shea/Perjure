@@ -39,14 +39,19 @@ namespace Perjure
         public int? MinimumFilesToKeep { get; set; }
 
         /// <summary>
-        /// Specifies whether or not sub-folders are included
+        /// Specifies whether or not sub-directories are included
         /// </summary>
-        public bool IncludeSubfolders { get; set; }
+        public bool IncludeSubdirectories { get; set; }
 
         /// <summary>
         /// Specifies whether or not hidden files are included
         /// </summary>
         public bool IncludeHiddenFiles { get; set; }
+
+        /// <summary>
+        /// Specifies whether or not empty sub-directories are deleted after files have been purged
+        /// </summary>
+        public bool DeleteEmptySubdirectories { get; set; }
 
         /// <summary>
         /// Specifies the type of file date to compare to the current system time when evaluating the <see cref="DaysToPurgeAfter"/>
@@ -79,7 +84,7 @@ namespace Perjure
                 return result;
             }
 
-            Log.Info("Purging '{0}'", DirectoryPath);
+            Log.Info("Purging files older than {0} days from '{1}'", DaysToPurgeAfter, DirectoryPath);
 
             var filesToPurge = FilesToPurge(compareToDate);
 
@@ -94,7 +99,7 @@ namespace Perjure
                 {
                     file.Delete();
 
-                    Log.Debug("Deleted '{0}'", file.FullName);
+                    Log.Debug("Deleted file '{0}'", file.FullName);
                     result.FilesDeletedCount++;
                 }
                 catch (Exception ex)
@@ -103,6 +108,8 @@ namespace Perjure
                     Log.Error(ex, "Failed to delete file '{0}'", file.FullName);
                 }
             }
+
+            ProcessEmptySubdirectories(DirectoryPath);
 
             return result;
         }
@@ -140,7 +147,7 @@ namespace Perjure
         {
             var directory = new DirectoryInfo(DirectoryPath);
             var regexPattern = new Regex(MatchPattern ?? "");
-            var allFiles = directory.GetFiles("*", IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            var allFiles = directory.GetFiles("*", IncludeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
                                                    regexPattern.IsMatch(f.Name));
@@ -151,6 +158,30 @@ namespace Perjure
             }
 
             return filesToPurge.ToList();
+        }
+
+        private void ProcessEmptySubdirectories(string baseDirectory)
+        {
+            if (!DeleteEmptySubdirectories)
+            {
+                return;
+            }
+
+            Log.Trace("Processing empty subdirectories");
+
+            foreach (var directory in Directory.EnumerateDirectories(baseDirectory))
+            {
+                if (IncludeSubdirectories)
+                {
+                    ProcessEmptySubdirectories(directory);
+                }
+
+                if (!Directory.EnumerateFileSystemEntries(directory).Any())
+                {
+                    Directory.Delete(directory);
+                    Log.Debug("Deleted empty subdirectory '{0}'", directory);
+                }
+            }
         }
     }
 }

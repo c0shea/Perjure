@@ -1,9 +1,11 @@
 ﻿[
   {
-    "DirectoryPath": "D:\\PerjureTest",
+    "DirectoryPath": "D:\\Temp",
     "MatchPattern": "",
-    "DaysToPurgeAfter": 30,
-    "IncludeSubfolders": false,
-    "IncludeHiddenFiles": false
+    "DaysToPurgeAfter": 7,
+    "IncludeSubdirectories": true,
+    "IncludeHiddenFiles": false,
+    "DeleteEmptySubdirectories": true,
+    "TimeComparison": "LastWrite"
   }
 ]
