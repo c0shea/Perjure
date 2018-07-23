@@ -4,21 +4,24 @@ Perjure is a small, light-weight console application that allows you to purge fo
 
 ## Installation
 
-Perjure requires no installation and can be deployed via ```xcopy```. Simply unzip the release, modify the ```Settings.json``` file to fit your needs, and run ```Perjure.exe``` from the command line.
+Perjure requires no installation and can be deployed via ```xcopy```. Simply unzip the release, modify the ```Configuration.json``` file to fit your needs, and run ```Perjure.exe``` from the command line.
 
 ## Usage
 
 ### Step 1
 
-Configure the settings file. The ```Settings.json``` file defines all of the purge rules that will be executed.
+Configure the settings file. The ```Configuration.json``` file defines all of the purge rules that will be executed.
 
     [
       {
         "DirectoryPath": "D:\\DirectoryWhoseFilesToPurge",
         "MatchPattern": "",
         "DaysToPurgeAfter": 30,
+        "MinimumFilesToKeep": 1,
         "IncludeSubfolders": false,
-        "IncludeHiddenFiles": false
+        "IncludeHiddenFiles": false,
+        "DeleteEmptySubdirectories": true,
+        "TimeComparison": "LastWrite"
       }
     ]
 
@@ -26,11 +29,11 @@ The MatchPattern property is a C# regular expression. This allows for more advan
 
 ### Step 2
 
-Run the program. There is only one command line parameter, which is the fully qualified path to the ```Settings.json``` file. If this parameter isn't specified, it defaults to the current executing location.
+Run the program. There is only one command line parameter, which is the fully qualified path to the ```Configuration.json``` file. If this parameter isn't specified, it defaults to the current executing location.
 
 Specifying a different location for the settings file:
 
-    Perjure.exe "D:\Settings.json"
+    Perjure.exe "D:\Configuration.json"
 
 Using the default settings file:
 
@@ -47,12 +50,3 @@ The program will return different exit codes so that appropriate error handling 
 * **4 - File Not Deleted:** A file was not deleted, which can be caused by any number of reasons. The file may be marked as read-only, the user account running Perjure does not have access to delete the file, or the file existed when the list of files to delete was constructed but was deleted by another user or process before Perjure could delete the file.
 
 Since the exit codes are a C# Flags Enum, additional exit codes can be returned which are a combination of those above. For example, ```6``` could be returned, which means that both a directory was not found and a file was not deleted.
-
-
-## Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request
