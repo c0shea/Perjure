@@ -6,7 +6,7 @@
     public enum TimeComparison
     {
         Creation,
-        Write,
-        Access
+        LastWrite,
+        LastAccess
     }
 }

@@ -117,17 +117,17 @@ namespace Perjure
             {
                 case TimeComparison.Creation:
                     filesToPurge = filesToPurge.Where(f => (compareToDate - f.CreationTimeUtc).TotalDays > DaysToPurgeAfter);
-                    filesToKeep = filesToPurge.OrderByDescending(f => f.CreationTimeUtc);
+                    filesToKeep = filesToKeep.OrderByDescending(f => f.CreationTimeUtc);
                     break;
 
-                case TimeComparison.Write:
+                case TimeComparison.LastWrite:
                     filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastWriteTimeUtc).TotalDays > DaysToPurgeAfter);
-                    filesToKeep = filesToPurge.OrderByDescending(f => f.LastWriteTimeUtc);
+                    filesToKeep = filesToKeep.OrderByDescending(f => f.LastWriteTimeUtc);
                     break;
 
-                case TimeComparison.Access:
+                case TimeComparison.LastAccess:
                     filesToPurge = filesToPurge.Where(f => (compareToDate - f.LastAccessTimeUtc).TotalDays > DaysToPurgeAfter);
-                    filesToKeep = filesToPurge.OrderByDescending(f => f.LastAccessTimeUtc);
+                    filesToKeep = filesToKeep.OrderByDescending(f => f.LastAccessTimeUtc);
                     break;
             }
 
