@@ -36,7 +36,7 @@ namespace Perjure
             Log.Info("{0} total seconds elapsed", stopwatch.Elapsed.TotalSeconds);
             Log.Info("{0} directories purged", purgeResults.Count(r => r.WasDirectoryPurged));
             Log.Info("{0} files deleted", purgeResults.Sum(r => r.FilesDeletedCount));
-            
+
             var programExitCode = ExitCode.Success;
             foreach (var exitCode in purgeResults.Select(d => d.RuleExitCode).Distinct())
             {
