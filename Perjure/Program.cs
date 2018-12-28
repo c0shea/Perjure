@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using NLog;
 
 namespace Perjure
@@ -11,18 +9,19 @@ namespace Perjure
     public static class Program
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-        private const string ConfigurationFileName = "Configuration.json";
 
         public static int Main(string[] args)
         {
             Log.Info("Started");
 
-            var settingsFilePath = GetConfigurationFilePath(args);
-            Log.Debug("Using settings file '{0}'", settingsFilePath);
-
-            var rules = ReadRulesFromSettingsFile(settingsFilePath);
-            if (rules == null)
+            List<PurgeRule> rules;
+            try
             {
+                rules = Configuration.Load(args);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Failed to read configuration file or configuration is invalid.");
                 return (int)ExitCode.InvalidConfiguration;
             }
 
@@ -53,27 +52,6 @@ namespace Perjure
             }
 
             return (int)programExitCode;
-        }
-
-        private static string GetConfigurationFilePath(string[] args)
-        {
-            return args.Length == 1
-                    ? args[0]
-                    : Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), ConfigurationFileName);
-        }
-
-        private static List<PurgeRule> ReadRulesFromSettingsFile(string settingsFilePath)
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<List<PurgeRule>>(File.ReadAllText(settingsFilePath));
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Failed to read configuration file or configuration is invalid.");
-            }
-
-            return null;
         }
 
         private static List<PurgeResult> ProcessRules(IEnumerable<PurgeRule> rules)
