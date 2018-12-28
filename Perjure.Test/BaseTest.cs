@@ -41,12 +41,17 @@ namespace Perjure.Test
 
         private DateTime Now(int daysFromNow) => DateTime.UtcNow.AddDays(daysFromNow);
 
-        private void CreateFile(string fileName, DateTime? allAttributeTime = null, bool isHidden = false)
+        private void CreateFile(string fileName, DateTime? allAttributeTime = null, bool isHidden = false, long? size = null)
         {
             var path = Path.Combine(TempPath, fileName);
 
-            using (File.Create(path))
+            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
             {
+                if (size.HasValue)
+                {
+                    fs.SetLength(size.Value);
+                }
+
             }
 
             var now = DateTime.UtcNow;
