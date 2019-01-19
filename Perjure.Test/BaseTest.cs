@@ -6,6 +6,9 @@ namespace Perjure.Test
 {
     public class BaseTest
     {
+        // ReSharper disable once InconsistentNaming
+        protected const int MB = 1024 * 1024;
+
         protected string TempPath { get; private set; }
         protected int StartingFileCount { get; private set; }
         protected int FileCount => Directory.GetFiles(TempPath).Length;
@@ -39,9 +42,9 @@ namespace Perjure.Test
 
         protected bool Exists(string fileName) => File.Exists(Path.Combine(TempPath, fileName));
 
-        private DateTime Now(int daysFromNow) => DateTime.UtcNow.AddDays(daysFromNow);
+        protected DateTime Now(int daysFromNow) => DateTime.UtcNow.AddDays(daysFromNow);
 
-        private void CreateFile(string fileName, DateTime? allAttributeTime = null, bool isHidden = false, long? size = null)
+        protected void CreateFile(string fileName, DateTime? allAttributeTime = null, bool isHidden = false, long? size = null)
         {
             var path = Path.Combine(TempPath, fileName);
 
@@ -70,6 +73,20 @@ namespace Perjure.Test
             {
                 fileInfo.Attributes &= ~FileAttributes.Hidden;
             }
+        }
+
+        protected void AssertSuccess(PurgeResult result)
+        {
+            Assert.IsNotNull(result);
+            Assert.AreEqual(ExitCode.Success, result.RuleExitCode);
+            Assert.AreEqual(true, result.WasDirectoryPurged);
+            Assert.IsTrue(result.FilesDeletedCount > 0);
+        }
+
+        protected void AssertFileCount(PurgeResult result)
+        {
+            Assert.IsTrue(FileCount < StartingFileCount);
+            Assert.AreEqual(result.FilesDeletedCount, StartingFileCount - FileCount);
         }
     }
 }

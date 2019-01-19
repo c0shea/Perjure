@@ -20,7 +20,8 @@ namespace Perjure.Test
 
             var result = rule.Process(DateTime.UtcNow);
 
-            SuccessAssert(result);
+            AssertSuccess(result);
+            AssertFileCount(result);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -49,7 +50,8 @@ namespace Perjure.Test
 
             var result = rule.Process(DateTime.UtcNow);
 
-            SuccessAssert(result);
+            AssertSuccess(result);
+            AssertFileCount(result);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -78,7 +80,8 @@ namespace Perjure.Test
 
             var result = rule.Process(DateTime.UtcNow);
 
-            SuccessAssert(result);
+            AssertSuccess(result);
+            AssertFileCount(result);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -114,7 +117,8 @@ namespace Perjure.Test
 
             var result = rule.Process(DateTime.UtcNow);
 
-            SuccessAssert(result);
+            AssertSuccess(result);
+            AssertFileCount(result);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -145,7 +149,8 @@ namespace Perjure.Test
 
             var result = rule.Process(DateTime.UtcNow);
 
-            SuccessAssert(result);
+            AssertSuccess(result);
+            AssertFileCount(result);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -165,15 +170,28 @@ namespace Perjure.Test
             Assert.IsTrue(Exists("Hidden.csv"));
         }
 
-        private void SuccessAssert(PurgeResult result)
+        [TestMethod]
+        public void DeleteLargeFiles()
         {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(ExitCode.Success, result.RuleExitCode);
-            Assert.AreEqual(true, result.WasDirectoryPurged);
-            Assert.IsTrue(result.FilesDeletedCount > 0);
+            var rule = new PurgeRule
+            {
+                DirectoryPath = TempPath,
+                DaysToPurgeAfter = 2,
+                MaximumFileSizeInBytesToKeep = 5 * MB
+            };
 
-            Assert.IsTrue(FileCount < StartingFileCount);
-            Assert.AreEqual(result.FilesDeletedCount, StartingFileCount - FileCount);
+            CreateFile("4MB.bin", Now(-1), size: 4 * MB);
+            CreateFile("5MB.bin", Now(-1), size: 5 * MB);
+            CreateFile("10MB.bin", Now(-1), size: 10 * MB);
+
+            var result = rule.Process(DateTime.UtcNow);
+
+            AssertSuccess(result);
+
+            // Only the 10 MB file is larger than the max threshold so it should be the only one of the 3 purged
+            Assert.IsTrue(Exists("4MB.bin"));
+            Assert.IsTrue(Exists("5MB.bin"));
+            Assert.IsFalse(Exists("10MB.bin"));
         }
     }
 }

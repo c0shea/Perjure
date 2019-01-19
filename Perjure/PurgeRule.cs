@@ -39,6 +39,13 @@ namespace Perjure
         public int? MinimumFilesToKeep { get; set; }
 
         /// <summary>
+        /// Specifies the maximum file size in bytes that should be kept. Files with sizes above this limit will always
+        /// be purged, regardless of the other criteria. For example, setting this to 20971520 will always remove all files
+        /// that are larger than 20 MB.
+        /// </summary>
+        public long? MaximumFileSizeInBytesToKeep { get; set; }
+
+        /// <summary>
         /// Specifies whether or not sub-directories are included
         /// </summary>
         public bool IncludeSubdirectories { get; set; }
@@ -139,6 +146,14 @@ namespace Perjure
             }
 
             filesToKeep = filesToKeep.Take(MinimumFilesToKeep ?? 0);
+
+            // Maximum file size always overrides all other criteria
+            if (MaximumFileSizeInBytesToKeep.HasValue)
+            {
+                var filesExceedingMaximumSize = allFilesMatchingName.Where(f => f.Length > MaximumFileSizeInBytesToKeep.Value).ToList();
+                filesToPurge = filesToPurge.Concat(filesExceedingMaximumSize);
+                filesToKeep = filesToKeep.Except(filesExceedingMaximumSize);
+            }
 
             return filesToPurge.Except(filesToKeep).ToList();
         }
