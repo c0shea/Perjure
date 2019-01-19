@@ -1,6 +1,8 @@
 # Perjure
 
-Perjure is a small, light-weight console application that allows you to purge folders after the number of days you define. Perjure works well with job schedulers that run the program daily.
+Perjure is a small, light-weight console application that allows you to purge folders after
+the number of days you define. Perjure works well with job schedulers that run the program
+at fixed intervals.
 
 ## Installation
 
