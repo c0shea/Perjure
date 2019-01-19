@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perjure", "Perjure\Perjure.csproj", "{75E7CC41-41E0-46D9-9647-3672BC1BA28B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perjure", "Perjure\Perjure.csproj", "{75E7CC41-41E0-46D9-9647-3672BC1BA28B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perjure.Test", "Perjure.Test\Perjure.Test.csproj", "{9104E1AD-20BB-4B0F-B80E-2F7C09C9AC76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perjure.Test", "Perjure.Test\Perjure.Test.csproj", "{9104E1AD-20BB-4B0F-B80E-2F7C09C9AC76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6E9D521F-FFA0-4983-B2FB-8A1D3A4D8410}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
