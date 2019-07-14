@@ -1,7 +1,8 @@
 ﻿using System;
+
 // ReSharper disable InconsistentNaming
 
-namespace Perjure.RecycleBin
+namespace Perjure.Native
 {
     /// <remarks>
     /// https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shemptyrecyclebinw
