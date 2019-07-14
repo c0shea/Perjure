@@ -1,10 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-
 // ReSharper disable InconsistentNaming
 
-namespace Perjure.Native
+namespace Perjure.RecycleBin
 {
     internal static class RecycleBin
     {

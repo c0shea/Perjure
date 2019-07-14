@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace Perjure.Native
+namespace Perjure.RecycleBin
 {
     /// <remarks>
     /// https://docs.microsoft.com/en-us/windows/win32/seccrypto/common-hresult-values
