@@ -1,13 +1,16 @@
-﻿[
-  {
-    "DirectoryPath": "D:\\Temp",
-    "MatchPattern": "",
-    "DaysToPurgeAfter": 7,
-    "MinimumFilesToKeep": null,
-    "MaximumFileSizeInBytesToKeep": null,
-    "IncludeSubdirectories": true,
-    "IncludeHiddenFiles": false,
-    "DeleteEmptySubdirectories": true,
-    "TimeComparison": "LastWrite"
-  }
-]
+﻿{
+  "IncludeRecycleBin": true,
+  "PurgeRules": [
+    {
+      "DirectoryPath": "D:\\Temp",
+      "MatchPattern": "",
+      "DaysToPurgeAfter": 7,
+      "MinimumFilesToKeep": null,
+      "MaximumFileSizeInBytesToKeep": null,
+      "IncludeSubdirectories": true,
+      "IncludeHiddenFiles": false,
+      "DeleteEmptySubdirectories": true,
+      "TimeComparison": "LastWrite"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using NLog;
 
 namespace Perjure
@@ -14,10 +16,11 @@ namespace Perjure
         {
             Log.Info("Started");
 
-            List<PurgeRule> rules;
+            Configuration configuration;
+
             try
             {
-                rules = Configuration.Load(args);
+                configuration = LoadConfiguration(args);
             }
             catch (Exception ex)
             {
@@ -28,7 +31,7 @@ namespace Perjure
             Log.Info("Processing rules...");
             var stopwatch = Stopwatch.StartNew();
 
-            var purgeResults = ProcessRules(rules);
+            var purgeResults = ProcessRules(configuration.PurgeRules);
 
             stopwatch.Stop();
 
@@ -60,6 +63,17 @@ namespace Perjure
             var compareToDate = DateTime.UtcNow;
 
             return rules.Select(rule => rule.Process(compareToDate)).ToList();
+        }
+
+        private static Configuration LoadConfiguration(string[] args)
+        {
+            var filePath = args.Length == 1
+                ? args[0]
+                : Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "Configuration.json");
+
+            Log.Info("Using settings file {FilePath}", filePath);
+
+            return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(filePath));
         }
     }
 }
