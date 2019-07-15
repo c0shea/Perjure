@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Perjure.PurgeRules;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Perjure
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 
@@ -7,13 +6,6 @@ namespace Perjure.Interop
 {
     internal static class RecycleBin
     {
-        internal static void Empty()
-        {
-            var emptyRecycleBinStatus = SHEmptyRecycleBin(IntPtr.Zero, null, RecycleFlags.SHERB_NOCONFIRMATION | RecycleFlags.SHERB_NOPROGRESSUI | RecycleFlags.SHERB_NOSOUND);
-
-            throw new Win32Exception((int)emptyRecycleBinStatus);
-        }
-
         /// <summary>
         /// Empties the Recycle Bin on the specified drive.
         /// </summary>
@@ -32,6 +24,6 @@ namespace Perjure.Interop
         /// https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shemptyrecyclebinw
         /// </remarks>
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-        private static extern HRESULT SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, RecycleFlags dwFlags);
+        internal static extern HRESULT SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, RecycleFlags dwFlags);
     }
 }

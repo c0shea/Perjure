@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using NLog;
 using Perjure.Interop;
@@ -14,15 +15,19 @@ namespace Perjure.PurgeRules
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 Log.Warn("Emptying the recycle bin is only supported on Windows.");
+                return;
             }
 
-            try
+            Log.Info("Emptying recycle bin");
+
+            var emptyRecycleBinStatus = RecycleBin.SHEmptyRecycleBin(
+                IntPtr.Zero, 
+                null, 
+                RecycleFlags.SHERB_NOCONFIRMATION | RecycleFlags.SHERB_NOPROGRESSUI | RecycleFlags.SHERB_NOSOUND);
+
+            if (emptyRecycleBinStatus != HRESULT.S_OK)
             {
-                RecycleBin.Empty();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to empty the recycle bin.");
+                throw new Win32Exception((int)emptyRecycleBinStatus);
             }
         }
     }
