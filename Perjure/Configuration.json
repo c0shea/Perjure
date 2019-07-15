@@ -1,5 +1,6 @@
 ﻿{
-  "IncludeRecycleBin": true,
+  "IncludeRecycleBin": false,
+  "InternetExplorerPurgeOptions": "TemporaryInternetFiles,Cookies,History,DownloadHistory",
   "PurgeRules": [
     {
       "DirectoryPath": "D:\\Temp",

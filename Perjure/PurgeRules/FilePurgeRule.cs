@@ -9,7 +9,7 @@ namespace Perjure.PurgeRules
 {
     public class FilePurgeRule : IPurgeRule
     {
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedAutoPropertyAccessor.Global

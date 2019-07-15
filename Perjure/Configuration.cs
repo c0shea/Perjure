@@ -8,6 +8,7 @@ namespace Perjure
     public class Configuration
     {
         public bool IncludeRecycleBin { get; set; }
+        public InternetExplorerPurgeOptions InternetExplorerPurgeOptions { get; set; }
         public List<FilePurgeRule> PurgeRules { get; set; }
 
         public IEnumerable<IPurgeRule> GetAllPurgeRules()
@@ -15,6 +16,11 @@ namespace Perjure
             if (IncludeRecycleBin)
             {
                 yield return new RecycleBinPurgeRule();
+            }
+
+            if (InternetExplorerPurgeOptions != InternetExplorerPurgeOptions.None)
+            {
+                yield return new InternetExplorerPurgeRule(InternetExplorerPurgeOptions);
             }
 
             if (PurgeRules != null)

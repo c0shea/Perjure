@@ -8,7 +8,7 @@ namespace Perjure.PurgeRules
 {
     public class RecycleBinPurgeRule : IPurgeRule
     {
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         public void Process(DateTime compareToDate)
         {
@@ -18,7 +18,7 @@ namespace Perjure.PurgeRules
                 return;
             }
 
-            Log.Info("Emptying recycle bin");
+            Log.Info("Emptying the recycle bin");
 
             var emptyRecycleBinStatus = RecycleBin.SHEmptyRecycleBin(
                 IntPtr.Zero, 
@@ -29,6 +29,8 @@ namespace Perjure.PurgeRules
             {
                 throw new Win32Exception((int)emptyRecycleBinStatus);
             }
+
+            Log.Info("Finished emptying the recycle bin");
         }
     }
 }

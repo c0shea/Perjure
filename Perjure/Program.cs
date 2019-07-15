@@ -8,7 +8,7 @@ namespace Perjure
 {
     public static class Program
     {
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         private static Configuration _configuration;
 
@@ -58,8 +58,7 @@ namespace Perjure
             var compareToDate = DateTime.UtcNow;
             var wasSuccessful = true;
             var stopwatch = Stopwatch.StartNew();
-
-
+            
             foreach (var purgeRule in _configuration.GetAllPurgeRules())
             {
                 try
