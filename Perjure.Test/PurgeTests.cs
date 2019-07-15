@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Perjure.PurgeRules;
 
 namespace Perjure.Test
 {
@@ -10,7 +11,7 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteAllFilesBeforeYesterday()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 1
@@ -18,10 +19,7 @@ namespace Perjure.Test
             
             Assert.AreEqual(StartingFileCount, FileCount);
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
-            AssertFileCount(result);
+            rule.Process(DateTime.UtcNow);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -41,17 +39,14 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteAllTxtFilesBefore7DaysAgo()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 7,
                 MatchPattern = "^.*\\.txt?$"
             };
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
-            AssertFileCount(result);
+            rule.Process(DateTime.UtcNow);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -71,17 +66,14 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteHiddenFiles()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 1,
                 IncludeHiddenFiles = true
             };
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
-            AssertFileCount(result);
+            rule.Process(DateTime.UtcNow);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -101,7 +93,7 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteByLastModifiedTime()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 1,
@@ -115,10 +107,7 @@ namespace Perjure.Test
 
             Assert.AreEqual(StartingFileCount, FileCount);
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
-            AssertFileCount(result);
+            rule.Process(DateTime.UtcNow);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -138,7 +127,7 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteAndKeepMinimumFiles()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 1,
@@ -147,10 +136,7 @@ namespace Perjure.Test
             
             Assert.AreEqual(StartingFileCount, FileCount);
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
-            AssertFileCount(result);
+            rule.Process(DateTime.UtcNow);
 
             Assert.IsTrue(Exists("Today.txt"));
             Assert.IsTrue(Exists("Today.csv"));
@@ -173,7 +159,7 @@ namespace Perjure.Test
         [TestMethod]
         public void DeleteLargeFiles()
         {
-            var rule = new PurgeRule
+            var rule = new FilePurgeRule
             {
                 DirectoryPath = TempPath,
                 DaysToPurgeAfter = 2,
@@ -184,9 +170,7 @@ namespace Perjure.Test
             CreateFile("5MB.bin", Now(-1), size: 5 * MB);
             CreateFile("10MB.bin", Now(-1), size: 10 * MB);
 
-            var result = rule.Process(DateTime.UtcNow);
-
-            AssertSuccess(result);
+            rule.Process(DateTime.UtcNow);
 
             // Only the 10 MB file is larger than the max threshold so it should be the only one of the 3 purged
             Assert.IsTrue(Exists("4MB.bin"));

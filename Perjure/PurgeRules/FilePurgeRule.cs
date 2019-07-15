@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NLog;
 
-namespace Perjure
+namespace Perjure.PurgeRules
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class PurgeRule
+    public class FilePurgeRule : IPurgeRule
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -72,7 +71,7 @@ namespace Perjure
         /// Purges the matching files in DirectoryPath
         /// </summary>
         /// <returns>The number of files deleted from DirectoryPath</returns>
-        public PurgeResult Process(DateTime compareToDate)
+        public void Process(DateTime compareToDate)
         {
             var result = new PurgeResult
             {
@@ -84,11 +83,8 @@ namespace Perjure
             {
                 result.FilesDeletedCount = 0;
                 result.WasDirectoryPurged = false;
-                result.RuleExitCode = ExitCode.DirectoryNotFound;
                 
                 Log.Error("Directory '{0}' was not found", DirectoryPath);
-
-                return result;
             }
 
             Log.Info("Purging files older than {0} days from '{1}'", DaysToPurgeAfter, DirectoryPath);
@@ -111,14 +107,11 @@ namespace Perjure
                 }
                 catch (Exception ex)
                 {
-                    result.RuleExitCode = ExitCode.FileNotDeleted;
                     Log.Error(ex, "Failed to delete file '{0}'", file.FullName);
                 }
             }
 
             ProcessEmptySubdirectories(DirectoryPath);
-
-            return result;
         }
 
         private List<FileInfo> FilesToPurge(DateTime compareToDate)
