@@ -87,12 +87,14 @@ namespace Perjure.PurgeRules
             Log.Info("Purging files older than {DaysToPurgeAfter} days from {DirectoryPath}", DaysToPurgeAfter, DirectoryPath);
 
             var filesToPurge = FilesToPurge(compareToDate);
+            var totalKilobytesPurged = 0m;
 
             foreach (var file in filesToPurge)
             {
                 try
                 {
                     file.Delete();
+                    totalKilobytesPurged += file.Length / 1024.0m;
 
                     Log.Debug("Deleted file {FileFullName}", file.FullName);
                 }
@@ -107,6 +109,8 @@ namespace Perjure.PurgeRules
             }
 
             ProcessEmptySubdirectories(DirectoryPath, compareToDate);
+
+            Log.Info("Finished purging {TotalMegabytesPurged} MB from {DirectoryPath}", totalKilobytesPurged / 1024.0m, DirectoryPath);
         }
 
         private IEnumerable<FileInfo> FilesToPurge(DateTime compareToDate)
