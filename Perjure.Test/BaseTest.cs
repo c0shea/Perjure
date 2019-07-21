@@ -74,19 +74,5 @@ namespace Perjure.Test
                 fileInfo.Attributes &= ~FileAttributes.Hidden;
             }
         }
-
-        protected void AssertSuccess(PurgeResult result)
-        {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(ExitCode.Success, result.RuleExitCode);
-            Assert.AreEqual(true, result.WasDirectoryPurged);
-            Assert.IsTrue(result.FilesDeletedCount > 0);
-        }
-
-        protected void AssertFileCount(PurgeResult result)
-        {
-            Assert.IsTrue(FileCount < StartingFileCount);
-            Assert.AreEqual(result.FilesDeletedCount, StartingFileCount - FileCount);
-        }
     }
 }

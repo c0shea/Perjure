@@ -88,12 +88,6 @@ namespace Perjure.PurgeRules
 
             var filesToPurge = FilesToPurge(compareToDate);
 
-            // TODO: Not really necessary
-            if (filesToPurge.Count == 0)
-            {
-                Log.Debug("No files to purge in directory");
-            }
-
             foreach (var file in filesToPurge)
             {
                 try
@@ -111,9 +105,9 @@ namespace Perjure.PurgeRules
             ProcessEmptySubdirectories(DirectoryPath, compareToDate);
         }
 
-        private List<FileInfo> FilesToPurge(DateTime compareToDate)
+        private IEnumerable<FileInfo> FilesToPurge(DateTime compareToDate)
         {
-            var allFilesMatchingName = AllFilesMatchingName();
+            var allFilesMatchingName = AllFilesMatchingName().ToList();
             IEnumerable<FileInfo> filesToPurge = allFilesMatchingName;
             IEnumerable<FileInfo> filesToKeep = allFilesMatchingName;
 
@@ -145,14 +139,15 @@ namespace Perjure.PurgeRules
                 filesToKeep = filesToKeep.Except(filesExceedingMaximumSize);
             }
 
-            return filesToPurge.Except(filesToKeep).ToList();
+            return filesToPurge.Except(filesToKeep);
         }
 
-        private List<FileInfo> AllFilesMatchingName()
+        private IEnumerable<FileInfo> AllFilesMatchingName()
         {
             var directory = new DirectoryInfo(DirectoryPath);
             var regexPattern = new Regex(MatchPattern ?? "");
-            var allFiles = directory.GetFiles("*", IncludeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+            var allFiles = directory.EnumerateFiles("*", IncludeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             var filesToPurge = allFiles.Where(f => !f.Attributes.HasFlag(FileAttributes.System) &&
                                                    regexPattern.IsMatch(f.Name));
@@ -162,7 +157,7 @@ namespace Perjure.PurgeRules
                 filesToPurge = filesToPurge.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
             }
 
-            return filesToPurge.ToList();
+            return filesToPurge;
         }
 
         private void ProcessEmptySubdirectories(string baseDirectory, DateTime compareToDate)
