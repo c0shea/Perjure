@@ -11,6 +11,7 @@
       "IncludeSubdirectories": true,
       "IncludeHiddenFiles": false,
       "DeleteEmptySubdirectories": true,
+      "DaysToPurgeEmptySubdirectoriesAfter": 7,
       "TimeComparison": "LastWrite"
     }
   ]

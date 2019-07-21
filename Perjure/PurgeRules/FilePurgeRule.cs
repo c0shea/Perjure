@@ -15,17 +15,17 @@ namespace Perjure.PurgeRules
         // ReSharper disable UnusedAutoPropertyAccessor.Global
 
         /// <summary>
-        /// Specifies the directory to purge, e.g. D:\Temp
+        /// Specifies the directory to purge, e.g. D:\Temp.
         /// </summary>
         public string DirectoryPath { get; set; }
 
         /// <summary>
-        /// Specifies the regular expression to match files, e.g. ^.*\.txt?$ matches files with .txt extension
+        /// Specifies the regular expression to match files, e.g. ^.*\.txt?$ matches files with .txt extension.
         /// </summary>
         public string MatchPattern { get; set; }
 
         /// <summary>
-        /// Specifies the number of days that a file must at least be in age in order to be purged
+        /// Specifies the number of days that a file must at least be in age in order to be purged.
         /// </summary>
         public short DaysToPurgeAfter { get; set; }
 
@@ -45,22 +45,27 @@ namespace Perjure.PurgeRules
         public long? MaximumFileSizeInBytesToKeep { get; set; }
 
         /// <summary>
-        /// Specifies whether or not sub-directories are included
+        /// Specifies whether or not sub-directories are included.
         /// </summary>
         public bool IncludeSubdirectories { get; set; }
 
         /// <summary>
-        /// Specifies whether or not hidden files are included
+        /// Specifies whether or not hidden files are included.
         /// </summary>
         public bool IncludeHiddenFiles { get; set; }
 
         /// <summary>
-        /// Specifies whether or not empty sub-directories are deleted after files have been purged
+        /// Specifies whether or not empty sub-directories are deleted after files have been purged.
         /// </summary>
         public bool DeleteEmptySubdirectories { get; set; }
 
         /// <summary>
-        /// Specifies the type of file date to compare to the current system time when evaluating the <see cref="DaysToPurgeAfter"/>
+        /// Specifies the number of days that a subdirectory must at least be in age in order to be purged.
+        /// </summary>
+        public short? DaysToPurgeEmptySubdirectoriesAfter { get; set; }
+
+        /// <summary>
+        /// Specifies the type of file date to compare to the current system time when evaluating the <see cref="DaysToPurgeAfter"/>.
         /// </summary>
         public TimeComparison TimeComparison { get; set; }
 
@@ -68,7 +73,7 @@ namespace Perjure.PurgeRules
         // ReSharper restore UnusedAutoPropertyAccessor.Global
 
         /// <summary>
-        /// Purges the matching files in DirectoryPath
+        /// Purges the matching files in DirectoryPath.
         /// </summary>
         /// <returns>The number of files deleted from DirectoryPath</returns>
         public void Process(DateTime compareToDate)
@@ -111,7 +116,7 @@ namespace Perjure.PurgeRules
                 }
             }
 
-            ProcessEmptySubdirectories(DirectoryPath);
+            ProcessEmptySubdirectories(DirectoryPath, compareToDate);
         }
 
         private List<FileInfo> FilesToPurge(DateTime compareToDate)
@@ -168,7 +173,7 @@ namespace Perjure.PurgeRules
             return filesToPurge.ToList();
         }
 
-        private void ProcessEmptySubdirectories(string baseDirectory)
+        private void ProcessEmptySubdirectories(string baseDirectory, DateTime compareToDate)
         {
             if (!DeleteEmptySubdirectories)
             {
@@ -181,14 +186,58 @@ namespace Perjure.PurgeRules
             {
                 if (IncludeSubdirectories)
                 {
-                    ProcessEmptySubdirectories(directory);
+                    ProcessEmptySubdirectories(directory, compareToDate);
                 }
 
-                if (!Directory.EnumerateFileSystemEntries(directory).Any())
+                if (Directory.EnumerateFileSystemEntries(directory).Any())
                 {
-                    Directory.Delete(directory);
-                    Log.Debug("Deleted empty subdirectory '{0}'", directory);
+                    continue;
                 }
+
+                if (DaysToPurgeEmptySubdirectoriesAfter.HasValue)
+                {
+                    switch (TimeComparison)
+                    {
+                        case TimeComparison.Creation:
+                            if ((compareToDate - Directory.GetCreationTimeUtc(directory)).TotalDays > DaysToPurgeEmptySubdirectoriesAfter)
+                            {
+                                Log.Trace("Skipping subdirectory {Directory} since it was created within the last {DaysToPurgeEmptySubdirectoriesAfter} days",
+                                    directory,
+                                    DaysToPurgeEmptySubdirectoriesAfter);
+
+                                continue;
+                            }
+
+                            break;
+
+                        case TimeComparison.LastWrite:
+                            if ((compareToDate - Directory.GetLastWriteTimeUtc(directory)).TotalDays > DaysToPurgeEmptySubdirectoriesAfter)
+                            {
+                                Log.Trace("Skipping subdirectory {Directory} since it was written to within the last {DaysToPurgeEmptySubdirectoriesAfter} days",
+                                    directory,
+                                    DaysToPurgeEmptySubdirectoriesAfter);
+
+                                continue;
+                            }
+
+                            break;
+
+                        case TimeComparison.LastAccess:
+                            if ((compareToDate - Directory.GetLastAccessTimeUtc(directory)).TotalDays > DaysToPurgeEmptySubdirectoriesAfter)
+                            {
+                                Log.Trace("Skipping subdirectory {Directory} since it was accessed within the last {DaysToPurgeEmptySubdirectoriesAfter} days",
+                                    directory,
+                                    DaysToPurgeEmptySubdirectoriesAfter);
+
+                                continue;
+                            }
+
+                            break;
+                    }
+                }
+
+                Directory.Delete(directory);
+                Log.Debug("Deleted empty subdirectory '{0}'", directory);
             }
         }
     }
