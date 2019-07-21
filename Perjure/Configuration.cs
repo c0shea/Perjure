@@ -9,7 +9,7 @@ namespace Perjure
     {
         public bool IncludeRecycleBin { get; set; }
         public InternetExplorerPurgeOptions InternetExplorerPurgeOptions { get; set; }
-        public List<FilePurgeRule> PurgeRules { get; set; }
+        public List<FilePurgeRule> FilePurgeRules { get; set; }
 
         public IEnumerable<IPurgeRule> GetAllPurgeRules()
         {
@@ -23,9 +23,9 @@ namespace Perjure
                 yield return new InternetExplorerPurgeRule(InternetExplorerPurgeOptions);
             }
 
-            if (PurgeRules != null)
+            if (FilePurgeRules != null)
             {
-                foreach (var purgeRule in PurgeRules)
+                foreach (var purgeRule in FilePurgeRules)
                 {
                     yield return purgeRule;
                 }
