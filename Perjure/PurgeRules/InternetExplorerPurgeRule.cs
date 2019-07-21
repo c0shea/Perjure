@@ -60,7 +60,7 @@ namespace Perjure.PurgeRules
                 return;
             }
 
-            Log.Info("Clearing Internet Explorer browsing history");
+            Log.Info("Clearing Internet Explorer browsing history with options {Options}", (int)_options);
 
             using (var process = new Process
             {
