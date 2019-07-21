@@ -1,5 +1,6 @@
 ﻿{
   "IncludeRecycleBin": false,
+  "IncludeTempDirectories": true,
   "InternetExplorerPurgeOptions": "TemporaryInternetFiles,Cookies,History,DownloadHistory",
   "FilePurgeRules": [
     {
@@ -11,7 +12,7 @@
       "IncludeSubdirectories": true,
       "IncludeHiddenFiles": false,
       "DeleteEmptySubdirectories": true,
-      "DaysToPurgeEmptySubdirectoriesAfter": 7,
+      "DaysToPurgeEmptySubdirectoriesAfter": null,
       "TimeComparison": "LastWrite"
     }
   ]
