@@ -96,6 +96,10 @@ namespace Perjure.PurgeRules
 
                     Log.Debug("Deleted file {FileFullName}", file.FullName);
                 }
+                catch (IOException ex) when (ex.Message.Contains("because it is being used by another process", StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Warn("Failed to delete file {FileFullName} because it is being used by another process", file.FullName);
+                }
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Failed to delete file {FileFullName}", file.FullName);
@@ -166,8 +170,6 @@ namespace Perjure.PurgeRules
             {
                 return;
             }
-
-            Log.Trace("Processing empty subdirectories");
 
             foreach (var directory in Directory.EnumerateDirectories(baseDirectory))
             {
