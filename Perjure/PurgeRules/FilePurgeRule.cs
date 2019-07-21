@@ -89,10 +89,10 @@ namespace Perjure.PurgeRules
                 result.FilesDeletedCount = 0;
                 result.WasDirectoryPurged = false;
                 
-                Log.Error("Directory '{0}' was not found", DirectoryPath);
+                Log.Error("Directory {DirectoryPath} was not found", DirectoryPath);
             }
 
-            Log.Info("Purging files older than {0} days from '{1}'", DaysToPurgeAfter, DirectoryPath);
+            Log.Info("Purging files older than {DaysToPurgeAfter} days from {DirectoryPath}", DaysToPurgeAfter, DirectoryPath);
 
             var filesToPurge = FilesToPurge(compareToDate);
 
@@ -107,12 +107,12 @@ namespace Perjure.PurgeRules
                 {
                     file.Delete();
 
-                    Log.Debug("Deleted file '{0}'", file.FullName);
+                    Log.Debug("Deleted file {FileFullName}", file.FullName);
                     result.FilesDeletedCount++;
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Failed to delete file '{0}'", file.FullName);
+                    Log.Error(ex, "Failed to delete file {FileFullName}", file.FullName);
                 }
             }
 
@@ -191,6 +191,8 @@ namespace Perjure.PurgeRules
 
                 if (Directory.EnumerateFileSystemEntries(directory).Any())
                 {
+                    Log.Trace("Skipping subdirectory {Directory} since it's not empty", directory);
+
                     continue;
                 }
 
@@ -237,7 +239,7 @@ namespace Perjure.PurgeRules
                 }
 
                 Directory.Delete(directory);
-                Log.Debug("Deleted empty subdirectory '{0}'", directory);
+                Log.Debug("Deleted empty subdirectory {Directory}", directory);
             }
         }
     }
