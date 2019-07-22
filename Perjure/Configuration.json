@@ -1,6 +1,6 @@
 ﻿{
   "$schema": "Configuration.Schema.json",
-  "IncludeRecycleBin": false,
+  "IncludeRecycleBin": true,
   "IncludeTempDirectories": true,
   "FilePurgeRules": [
     {

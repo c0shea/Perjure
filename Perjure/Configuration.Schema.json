@@ -28,6 +28,8 @@
         },
         "DaysToPurgeAfter": {
           "type": "integer",
+          "minimum": 0,
+          "maximum": 32767,
           "description": "Specifies the number of days that a file must at least be in age in order to be purged."
         },
         "MinimumFilesToKeep": {
@@ -35,6 +37,7 @@
             "integer",
             "null"
           ],
+          "minimum": 0,
           "default": null,
           "description": "Specifies a minimum number of most recent files that should be kept even if they match all of the criteria (ignoring the DaysToPurgeAfter). For example, setting this to 5 allows you to keep the most recent 5 files in this directory matching the MatchPattern but all others that are older than the DaysToPurgeAfter will be purged."
         },
@@ -43,6 +46,7 @@
             "integer",
             "null"
           ],
+          "minimum": 0,
           "default": null,
           "description": "Specifies the maximum file size in bytes that should be kept. Files with sizes above this limit will always be purged, regardless of the other criteria. For example, setting this to 20971520 will always remove all files that are larger than 20 MB."
         },
@@ -66,6 +70,7 @@
             "integer",
             "null"
           ],
+          "minimum": 0,
           "default": null,
           "description": "Specifies the number of days that a subdirectory must at least be in age in order to be purged."
         },
@@ -82,11 +87,7 @@
       },
       "required": [
         "DirectoryPath",
-        "DaysToPurgeAfter",
-        "IncludeSubdirectories",
-        "IncludeHiddenFiles",
-        "DeleteEmptySubdirectories",
-        "TimeComparison"
+        "DaysToPurgeAfter"
       ]
     }
   },
