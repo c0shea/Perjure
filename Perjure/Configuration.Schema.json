@@ -1,0 +1,128 @@
+{
+  "id": "https://raw.githubusercontent.com/c0shea/Perjure/master/Perjure/Configuration.Schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Perjure Configuration",
+  "version": "3.0.0",
+  "definitions": {
+    "FilePurgeRule": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "DirectoryPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Specifies the directory to purge, e.g. D:\\Temp.",
+          "minLength": 1
+        },
+        "MatchPattern": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": "" ,
+          "description": "Specifies the regular expression to match files, e.g. ^.*\\.txt?$ matches files with .txt extension."
+        },
+        "DaysToPurgeAfter": {
+          "type": "integer",
+          "description": "Specifies the number of days that a file must at least be in age in order to be purged."
+        },
+        "MinimumFilesToKeep": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "description": "Specifies a minimum number of most recent files that should be kept even if they match all of the criteria (ignoring the DaysToPurgeAfter). For example, setting this to 5 allows you to keep the most recent 5 files in this directory matching the MatchPattern but all others that are older than the DaysToPurgeAfter will be purged."
+        },
+        "MaximumFileSizeInBytesToKeep": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "description": "Specifies the maximum file size in bytes that should be kept. Files with sizes above this limit will always be purged, regardless of the other criteria. For example, setting this to 20971520 will always remove all files that are larger than 20 MB."
+        },
+        "IncludeSubdirectories": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether or not sub-directories are included."
+        },
+        "IncludeHiddenFiles": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether or not hidden files are included."
+        },
+        "DeleteEmptySubdirectories": {
+          "type": "boolean",
+          "default": false,
+          "description": "Specifies whether or not empty sub-directories are deleted after files have been purged."
+        },
+        "DaysToPurgeEmptySubdirectoriesAfter": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "description": "Specifies the number of days that a subdirectory must at least be in age in order to be purged."
+        },
+        "TimeComparison": {
+          "type": "string",
+          "enum": [
+            "Creation",
+            "LastWrite",
+            "LastAccess"
+          ],
+          "default": "Creation",
+          "description": "Specifies the type of file date to compare to the current system time when evaluating the DaysToPurgeAfter."
+        }
+      },
+      "required": [
+        "DirectoryPath",
+        "DaysToPurgeAfter",
+        "IncludeSubdirectories",
+        "IncludeHiddenFiles",
+        "DeleteEmptySubdirectories",
+        "TimeComparison"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "IncludeRecycleBin": {
+      "type": "boolean"
+    },
+    "IncludeTempDirectories": {
+      "type": "boolean"
+    },
+    "InternetExplorerPurgeOptions": {
+      "type": "string",
+      "enum": [
+        "None",
+        "TemporaryInternetFiles",
+        "Cookies",
+        "History",
+        "DownloadHistory",
+        "FormData",
+        "Passwords",
+        "TrackingProtection"
+      ]
+    },
+    "FilePurgeRules": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/definitions/FilePurgeRule"
+      }
+    }
+  },
+  "required": [
+    "IncludeRecycleBin",
+    "IncludeTempDirectories"
+  ]
+}

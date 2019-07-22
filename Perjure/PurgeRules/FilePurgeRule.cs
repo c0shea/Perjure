@@ -11,6 +11,8 @@ namespace Perjure.PurgeRules
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
+        #region Properties
+
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedAutoPropertyAccessor.Global
 
@@ -71,6 +73,8 @@ namespace Perjure.PurgeRules
 
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore UnusedAutoPropertyAccessor.Global
+
+        #endregion
 
         /// <summary>
         /// Purges the matching files in DirectoryPath.
