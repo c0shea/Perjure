@@ -98,19 +98,6 @@
     "IncludeTempDirectories": {
       "type": "boolean"
     },
-    "InternetExplorerPurgeOptions": {
-      "type": "string",
-      "enum": [
-        "None",
-        "TemporaryInternetFiles",
-        "Cookies",
-        "History",
-        "DownloadHistory",
-        "FormData",
-        "Passwords",
-        "TrackingProtection"
-      ]
-    },
     "FilePurgeRules": {
       "type": [
         "array",

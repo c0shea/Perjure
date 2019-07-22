@@ -2,7 +2,6 @@
   "$schema": "Configuration.Schema.json",
   "IncludeRecycleBin": false,
   "IncludeTempDirectories": true,
-  "InternetExplorerPurgeOptions": "TemporaryInternetFiles,Cookies,History,DownloadHistory",
   "FilePurgeRules": [
     {
       "DirectoryPath": "D:\\Temp",

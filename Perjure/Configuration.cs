@@ -16,7 +16,6 @@ namespace Perjure
 
         public bool IncludeRecycleBin { get; set; }
         public bool IncludeTempDirectories { get; set; }
-        public InternetExplorerPurgeOptions InternetExplorerPurgeOptions { get; set; }
         public List<FilePurgeRule> FilePurgeRules { get; set; }
 
         public IEnumerable<IPurgeRule> GetAllPurgeRules()
@@ -24,11 +23,6 @@ namespace Perjure
             if (IncludeRecycleBin)
             {
                 yield return new RecycleBinPurgeRule();
-            }
-
-            if (InternetExplorerPurgeOptions != InternetExplorerPurgeOptions.None)
-            {
-                yield return new InternetExplorerPurgeRule(InternetExplorerPurgeOptions);
             }
 
             if (IncludeTempDirectories)
