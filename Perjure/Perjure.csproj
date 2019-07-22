@@ -4,11 +4,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ApplicationIcon>Trash Can.ico</ApplicationIcon>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <AssemblyVersion>4.0.0</AssemblyVersion>
     <Description>Purge folders after the number of days you define</Description>
     <Copyright>Copyright © 2019 Connor O'Shea</Copyright>
-    <Version>3.0.0</Version>
+    <Version>4.0.0</Version>
     <RepositoryUrl>https://github.com/c0shea/Perjure</RepositoryUrl>
+    <FileVersion>4.0.0</FileVersion>
+    <PackageTags>Purge, Cleanup, Empty, Aging</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +33,5 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties configuration_1schema_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
 
 </Project>

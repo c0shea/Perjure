@@ -2,7 +2,7 @@
   "id": "https://raw.githubusercontent.com/c0shea/Perjure/master/Perjure/Configuration.Schema.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Perjure Configuration",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "definitions": {
     "FilePurgeRule": {
       "type": [
