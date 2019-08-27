@@ -19,19 +19,21 @@ and run ```Perjure.exe``` from the command line.
 Configure the settings file. The ```Configuration.json``` file defines all of the
 purge rules that will be executed.
 
-    [
-      {
-        "DirectoryPath": "D:\\DirectoryWhoseFilesToPurge",
-        "MatchPattern": "",
-        "DaysToPurgeAfter": 30,
-        "MinimumFilesToKeep": 1,
-        "MaximumFileSizeInBytesToKeep": 209715200,
-        "IncludeSubdirectories": false,
-        "IncludeHiddenFiles": false,
-        "DeleteEmptySubdirectories": true,
-        "TimeComparison": "LastWrite"
-      }
-    ]
+```json
+[
+  {
+    "DirectoryPath": "D:\\DirectoryWhoseFilesToPurge",
+    "MatchPattern": "",
+    "DaysToPurgeAfter": 30,
+    "MinimumFilesToKeep": 1,
+    "MaximumFileSizeInBytesToKeep": 209715200,
+    "IncludeSubdirectories": false,
+    "IncludeHiddenFiles": false,
+    "DeleteEmptySubdirectories": true,
+    "TimeComparison": "LastWrite"
+  }
+]
+```
 
 The MatchPattern property is a C# regular expression. This allows for advanced file matching.
 An empty match pattern will return all files in the directory.
